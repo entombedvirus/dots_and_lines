@@ -1,0 +1,11 @@
+p The URL for the game is
+	a(href: "/g/" + game_id)= game_id
+
+div(id: game_id, class="game")
+
+script
+	var serverGame = !{JSON.stringify(game)};
+	Client.Game.prototype = $.extend(Client.Game.prototype, serverGame);
+	var g = new Client.Game($('#' + !{JSON.stringify(game_id)}));
+	console.log("client alpha", g.alpha)
+	g.render();
