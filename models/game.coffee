@@ -1,9 +1,13 @@
-EventEmitter = require('events').EventEmitter
-
-module.exports = class Game extends EventEmitter
-	constructor: (@size) ->
+module.exports = class Game
+	constructor: (options) ->
+		@id = options.id
+		@size = options.size
+		@clients = options.clients
 		@resetBoard()
-	
+
+	emit: (eventName, data...) ->
+		@clients.now.handleServerEvent eventName, data
+
 	resetBoard: ->
 		@alpha = 2 * @size - 1
 		@num_edges = 2 * @size * (@size - 1)
@@ -21,6 +25,7 @@ module.exports = class Game extends EventEmitter
 			@checkSquare 'top', edgeNum unless @isOnPerimeter 'top', edgeNum
 			@checkSquare 'bottom', edgeNum unless @isOnPerimeter 'bottom', edgeNum
 
+		@emit 'fillEdge', edgeNum
 		true
 	
 	isVerticalEdge: (edgeNum) ->
@@ -59,3 +64,8 @@ module.exports = class Game extends EventEmitter
 				edgeNum in [0...@size]
 			when 'bottom'
 				edgeNum in [(@num_edges - @size + 1)..@num_edges]
+	
+	forClient: ->
+		size: @size
+		alpha: @alpha
+		board: @board

@@ -1,4 +1,5 @@
 express = require 'express'
+nowjs = require 'now'
 Game = require './models/game'
 
 app = module.exports = express.createServer()
@@ -9,12 +10,15 @@ mime.define
 	'text/coffeescript': ['coffee']
 
 DEFAULT_BOARD_SIZE = 6
+DEFAULT_PORT = 3000
 
-createNewGame = ->
-	g = new Game DEFAULT_BOARD_SIZE
-	g.on 'completeSquare', ->
-		console.log "Square Completed!!"
-	g
+createNewGame = (gameId) ->
+	room = nowjs.getGroup gameId
+	new Game
+		id: gameId
+		size: DEFAULT_BOARD_SIZE
+		clients: room
+
 
 # Configuration
 app.configure ->
@@ -24,6 +28,10 @@ app.configure ->
 	app.use express.bodyParser()
 	app.use express.methodOverride()
 	app.use app.router
+	app.use express.compiler
+		src: __dirname + "/client"
+		dest: __dirname + "/public"
+		enable: ["coffeescript"]
 	app.use express.static __dirname + '/public'
 
 all_games = {}
@@ -34,7 +42,7 @@ app.get '/games', (req, res) ->
 
 app.get '/g/:game_id', (req, res) ->
 	gid = req.params.game_id
-	all_games[gid] ||= createNewGame()
+	all_games[gid] ||= createNewGame gid
 	res.local 'game_id', gid
 	res.local 'game', all_games[gid]
 	res.render 'games/show'
@@ -42,9 +50,22 @@ app.get '/g/:game_id', (req, res) ->
 app.get '/g/:game_id/set/:edge_num', (req, res) ->
 	gid = req.params.game_id
 	all_games[gid].fillEdge parseInt req.params.edge_num
-	res.redirect "/g/#{gid}"
+	res.send true
 
 # Only listen on $ node app.js
 unless module.parent
-	app.listen 3000
+	app.listen DEFAULT_PORT
 	console.log "Express server listening on port %d", app.address().port
+
+	# Start the dnode listener for persistent connections
+	everyone = nowjs.initialize app
+
+	everyone.connected ->
+		gameId = @now.gameId
+		room = nowjs.getGroup gameId
+		room.addUser @user.clientId
+
+	everyone.disconnected ->
+		gameId = @now.gameId
+		room = nowjs.getGroup gameId
+		room.removeUser @user.clientId

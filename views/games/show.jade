@@ -4,8 +4,23 @@ p The URL for the game is
 div(id: game_id, class="game")
 
 script
-	var serverGame = !{JSON.stringify(game)};
+	var serverGame = !{JSON.stringify(game.forClient())};
+	var gameId = !{game_id}
+	var container = $('#' + gameId);
 	Client.Game.prototype = $.extend(Client.Game.prototype, serverGame);
-	var g = new Client.Game($('#' + !{JSON.stringify(game_id)}));
-	console.log("client alpha", g.alpha)
+	var g = new Client.Game(container);
 	g.render();
+
+	now.gameId = gameId;
+
+	now.handleServerEvent = function(eventName, data) {
+		console.log('server emitted:', eventName, 'with data', data);
+
+		switch(eventName) {
+		case 'fillEdge':
+			var edgeNum = data[0];
+			var edges = container.find('a');
+			$(edges.get(edgeNum)).addClass('filled');
+			break;
+		}
+	};

@@ -8,12 +8,10 @@ class Client.Game
 			
 			gameId = @container.attr 'id'
 			target.attr "href", "/g/#{gameId}/set/#{target.data('edgeNum')}"
-			return true
+			$.getJSON target.attr('href')
+			return false
 
-		console.log "Client game construction detected"
-	
 	render: ->
-		console.log "render triggered on client game"
 		for edge, edgeNum in @board
 			link = $("<a></a>").html '&nbsp'
 			currentOrientation = @isVerticalEdge edgeNum
