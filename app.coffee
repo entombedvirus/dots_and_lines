@@ -44,11 +44,6 @@ app.get '/g/:game_id', (req, res) ->
 	res.local 'game', all_games[gid]
 	res.render 'games/show'
 
-app.get '/g/:game_id/set/:edge_num', (req, res) ->
-	gid = req.params.game_id
-	all_games[gid].fillEdge parseInt req.params.edge_num
-	res.send true
-
 # Only listen on $ node app.js
 unless module.parent
 	app.listen DEFAULT_PORT
@@ -56,6 +51,10 @@ unless module.parent
 
 	# Start the dnode listener for persistent connections
 	everyone = nowjs.initialize app
+	everyone.now.handleClientEvent = ->
+		gameId = @now.gameId
+		game = all_games[gameId]
+		ServerGame::handleClientEvent.call game, this, arguments...
 
 	everyone.connected ->
 		gameId = @now.gameId

@@ -9,19 +9,12 @@ script
 	var container = $('#' + gameId);
 	var ClientGame = require('./client_game');
 	ClientGame.prototype = $.extend(ClientGame.prototype, serverGame);
-	var g = new ClientGame(container);
+	var g = new ClientGame({
+		container: container,
+		server: window.now
+	});
 	g.render();
 
 	now.gameId = gameId;
 
-	now.handleServerEvent = function(eventName, data) {
-		console.log('server emitted:', eventName, 'with data', data);
-
-		switch(eventName) {
-		case 'fillEdge':
-			var edgeNum = data[0];
-			var edges = container.find('a');
-			$(edges.get(edgeNum)).addClass('filled');
-			break;
-		}
-	};
+	now.handleServerEvent = ClientGame.prototype.handleServerEvent.bind(g);

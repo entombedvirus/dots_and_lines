@@ -10,6 +10,12 @@ module.exports = class ServerGame extends AbstractGame
 	emit: (eventName, data...) ->
 		@clients.now.handleServerEvent eventName, data
 
+	handleClientEvent: (client, eventName, data) ->
+		switch eventName
+			when 'fillEdge'
+				edgeNum = data[0]
+				@fillEdge edgeNum
+
 	fillEdge: (edgeNum) ->
 		error = super
 		return false if error is false
@@ -19,12 +25,12 @@ module.exports = class ServerGame extends AbstractGame
 	
 	checkSquare: (direction, edgeNum) ->
 		squareCompleted = super
-		return squareCompleted if squareCompleted is false
+		return false if squareCompleted is false
 
 		# if execution has gotten this far, all the neighbors are set
 		@emit 'completeSquare'
 		true
-
+	
 	forClient: ->
 		size: @size
 		alpha: @alpha
