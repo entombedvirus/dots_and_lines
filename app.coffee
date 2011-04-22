@@ -1,20 +1,19 @@
 express = require 'express'
-nowjs = require 'now'
-Game = require './models/game'
+nowjs   = require 'now'
+fs      = require 'fs'
+
+ServerGame = require './models/server_game'
 
 app = module.exports = express.createServer()
-
-# register a new mime type for client-side coffeescript
-mime = require "mime"
-mime.define
-	'text/coffeescript': ['coffee']
 
 DEFAULT_BOARD_SIZE = 6
 DEFAULT_PORT = 3000
 
+all_games = {}
+
 createNewGame = (gameId) ->
 	room = nowjs.getGroup gameId
-	new Game
+	new ServerGame
 		id: gameId
 		size: DEFAULT_BOARD_SIZE
 		clients: room
@@ -28,13 +27,11 @@ app.configure ->
 	app.use express.bodyParser()
 	app.use express.methodOverride()
 	app.use app.router
-	app.use express.compiler
-		src: __dirname + "/client"
-		dest: __dirname + "/public"
-		enable: ["coffeescript"]
 	app.use express.static __dirname + '/public'
-
-all_games = {}
+	app.use require('browserify')
+		base : __dirname + '/models'
+		mount : '/browserify.js'
+	
 
 app.get '/games', (req, res) ->
 	res.local 'all_games', all_games

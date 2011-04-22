@@ -7,8 +7,9 @@ script
 	var serverGame = !{JSON.stringify(game.forClient())};
 	var gameId = !{game_id}
 	var container = $('#' + gameId);
-	Client.Game.prototype = $.extend(Client.Game.prototype, serverGame);
-	var g = new Client.Game(container);
+	var ClientGame = require('./client_game');
+	ClientGame.prototype = $.extend(ClientGame.prototype, serverGame);
+	var g = new ClientGame(container);
 	g.render();
 
 	now.gameId = gameId;

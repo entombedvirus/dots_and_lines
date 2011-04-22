@@ -1,18 +1,23 @@
-module.exports = class Game
-	constructor: (options) ->
-		@id = options.id
-		@size = options.size
-		@clients = options.clients
-		@resetBoard()
-
-	emit: (eventName, data...) ->
-		@clients.now.handleServerEvent eventName, data
-
+module.exports = class AbstractGame
 	resetBoard: ->
 		@alpha = 2 * @size - 1
 		@num_edges = 2 * @size * (@size - 1)
 		@board = new Array @num_edges
 	
+	isVerticalEdge: (edgeNum) ->
+		(edgeNum % @alpha) >= Math.floor(@alpha / 2)
+
+	isOnPerimeter: (direction, edgeNum) ->
+		switch direction
+			when 'left'
+				edgeNum % @alpha == @size - 1
+			when 'right'
+				edgeNum % @alpha == @alpha - 1
+			when 'top'
+				edgeNum in [0...@size]
+			when 'bottom'
+				edgeNum in [(@num_edges - @size + 1)..@num_edges]
+
 	fillEdge: (edgeNum) ->
 		return false unless 0 <= edgeNum < @num_edges
 
@@ -25,14 +30,9 @@ module.exports = class Game
 			@checkSquare 'top', edgeNum unless @isOnPerimeter 'top', edgeNum
 			@checkSquare 'bottom', edgeNum unless @isOnPerimeter 'bottom', edgeNum
 
-		@emit 'fillEdge', edgeNum
 		true
-	
-	isVerticalEdge: (edgeNum) ->
-		(edgeNum % @alpha) >= Math.floor(@alpha / 2)
-	
-	checkSquare: (direction, edgeNum) ->
 
+	checkSquare: (direction, edgeNum) ->
 		coordinates = switch direction
 			when 'left'
 				[edgeNum - 1, edgeNum - @size, edgeNum + (@size - 1)]
@@ -51,21 +51,4 @@ module.exports = class Game
 			return false unless @board[edge]
 
 		# if execution has gotten this far, all the neighbors are set
-		@emit 'completeSquare'
 		true
-
-	isOnPerimeter: (direction, edgeNum) ->
-		switch direction
-			when 'left'
-				edgeNum % @alpha == @size - 1
-			when 'right'
-				edgeNum % @alpha == @alpha - 1
-			when 'top'
-				edgeNum in [0...@size]
-			when 'bottom'
-				edgeNum in [(@num_edges - @size + 1)..@num_edges]
-	
-	forClient: ->
-		size: @size
-		alpha: @alpha
-		board: @board

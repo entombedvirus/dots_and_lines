@@ -1,6 +1,6 @@
-Client ?= {}
+AbstractGame = require './abstract_game'
 
-class Client.Game
+module.exports = class ClientGame extends AbstractGame
 	constructor: (@container)->
 		@container.click (e) =>
 			target = $(e.target)
@@ -25,16 +25,3 @@ class Client.Game
 			link.addClass 'filled' if @board[edgeNum]
 			link.data 'edgeNum', edgeNum
 
-	isVerticalEdge: (edgeNum) ->
-		(edgeNum % @alpha) >= Math.floor(@alpha / 2)
-
-	isOnPerimeter: (direction, edgeNum) ->
-		switch direction
-			when 'left'
-				edgeNum % @alpha == @size - 1
-			when 'right'
-				edgeNum % @alpha == @alpha - 1
-			when 'top'
-				edgeNum in [0...@size]
-			when 'bottom'
-				edgeNum in [(@num_edges - @size + 1)..@num_edges]
