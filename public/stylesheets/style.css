@@ -26,3 +26,21 @@ a {
 	width: 1em;
 	margin: 0 2em 0 0;
 }
+
+#notifications {
+	background-color: #000;
+	opacity: 0.8;
+	font: normal 20px/42px Helvetica, Aria, sans-serif;
+	position: fixed;
+	top: 130px;
+	left: 25%;
+	width: 50%;
+	color: white;
+	text-align: center;
+	z-index: 100;
+	border-radius: 10px;
+}
+#notifications p {
+	padding: 0.3em;
+	display: inline
+}

@@ -1,8 +1,10 @@
 AbstractGame = require './abstract_game'
+UI = require('./ui').getInstance()
 
 module.exports = class ClientGame extends AbstractGame
 	constructor: (options)->
 		@container = options.container
+		@gameUrl = window.location.href
 		@attachListeners()
 
 	attachListeners: ->
@@ -20,12 +22,27 @@ module.exports = class ClientGame extends AbstractGame
 		window.now.handleClientEvent eventName, data
 
 	handleServerEvent: (eventName, data) ->
+		console.log "server said", eventName, data
 		switch eventName
+			when 'needMorePlayers'
+				UI.showMessage '''
+					You're the only one connected
+					to this game right now. Invite someone to play
+					with you by sending them a link to this page.
+				'''
+			when 'notYourTurn'
+				UI.showMessage '''
+					It's not your turn...
+				'''
+
 			when 'fillEdge'
 				edgeNum = data[0];
-				edges = @container.find('a');
-				$(edges.get(edgeNum)).addClass 'filled'
-				true
+				@fillEdge edgeNum
+
+	fillEdge: (edgeNum) ->
+		super
+		edges = @container.find('a');
+		$(edges.get(edgeNum)).addClass 'filled'
 
 	render: ->
 		for edge, edgeNum in @board
@@ -40,4 +57,3 @@ module.exports = class ClientGame extends AbstractGame
 			link.css 'clear', 'left' if switching
 			link.addClass 'filled' if @board[edgeNum]
 			link.data 'edgeNum', edgeNum
-

@@ -1,5 +1,6 @@
 module.exports = class AbstractGame
 	resetBoard: ->
+		@totalMoves = 0
 		@alpha = 2 * @size - 1
 		@num_edges = 2 * @size * (@size - 1)
 		@board = new Array @num_edges
@@ -21,6 +22,7 @@ module.exports = class AbstractGame
 	fillEdge: (edgeNum) ->
 		return false unless 0 <= edgeNum < @num_edges
 
+		@totalMoves++;
 		@board[edgeNum] = true
 
 		if @isVerticalEdge edgeNum
