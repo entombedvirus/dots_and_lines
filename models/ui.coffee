@@ -1,7 +1,7 @@
 class UI
 	constructor: ->
 		$(document).ready =>
-			@container = $("<div id='notifications'><p>hai hai</p></div>")
+			@container = $("<div id='notifications'><p></p></div>")
 			@container.prependTo $('body')
 			@container.click @hideMessage
 

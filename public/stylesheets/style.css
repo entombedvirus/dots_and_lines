@@ -28,6 +28,7 @@ a {
 }
 
 #notifications {
+	display: none;
 	background-color: #000;
 	opacity: 0.8;
 	font: normal 20px/42px Helvetica, Aria, sans-serif;
