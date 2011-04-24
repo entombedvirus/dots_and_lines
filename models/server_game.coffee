@@ -5,19 +5,18 @@ module.exports = class ServerGame extends BaseGame
 		@id = options.id
 		@size = options.size
 		@clients = options.clients
-		@connectedPlayers = {}
+
 		@attachListeners()
 		@resetBoard()
 
 	attachListeners: ->
-		@clients.on 'connect', @onPlayerConnected
-		@clients.on 'disconnect', @onPlayerDisconnected
+		@clients.on 'connect', (clientId) =>
+			@addPlayer clientId
+			@emit 'playerJoined', clientId
 
-	onPlayerConnected: (clientId) =>
-		@connectedPlayers[clientId] = true
-	
-	onPlayerDisconnected: (clientId) =>
-		delete @connectedPlayers[clientId]
+		@clients.on 'disconnect', (clientId) =>
+			@removePlayer clientId
+			@emit 'playerLeft', clientId
 
 	emit: (eventName, data...) ->
 		@clients.now.handleServerEvent eventName, data
@@ -27,28 +26,19 @@ module.exports = class ServerGame extends BaseGame
 			when 'fillEdge'
 				# don't let the player have infinte moves if they are the
 				# only one connected
-				if Object.keys(@connectedPlayers).length < 2
+				if @players.states.length < 2
 					client.now.handleServerEvent 'needMorePlayers'
 					return false
 
-				if @isCurrentClientsTurn client
+				if @players.getCurrentState() == client.user.clientId
 					edgeNum = data[0]
 					@fillEdge edgeNum
 				else
 					client.now.handleServerEvent 'notYourTurn'
 
-	isCurrentClientsTurn: (client) ->
-		players = Object.keys @connectedPlayers
-		currentPlayerIdx = @totalMoves % players.length
-		currentPlayerClientId = players[currentPlayerIdx]
-		client.user.clientId == currentPlayerClientId
-
 	fillEdge: (edgeNum) ->
-		error = super
-		return false if error is false
-
 		@emit 'fillEdge', edgeNum
-		true
+		super
 	
 	checkSquare: (direction, edgeNum) ->
 		squareCompleted = super
@@ -61,5 +51,7 @@ module.exports = class ServerGame extends BaseGame
 	forClient: ->
 		size: @size
 		alpha: @alpha
+		num_edges: @num_edges
 		board: @board
+		players: @players
 		totalMoves: @totalMoves

@@ -1,9 +1,18 @@
+StateMachine = require './state_machine'
+
 module.exports = class BaseGame
 	resetBoard: ->
 		@totalMoves = 0
 		@alpha = 2 * @size - 1
 		@num_edges = 2 * @size * (@size - 1)
 		@board = new Array @num_edges
+		@players = new StateMachine
+
+	addPlayer: (clientId) ->
+		@players.addState clientId
+	
+	removePlayer: (clientId) ->
+		@players.removeState clientId
 	
 	isVerticalEdge: (edgeNum) ->
 		(edgeNum % @alpha) >= Math.floor(@alpha / 2)
@@ -20,19 +29,21 @@ module.exports = class BaseGame
 				edgeNum in [(@num_edges - @size + 1)..@num_edges]
 
 	fillEdge: (edgeNum) ->
-		return false unless 0 <= edgeNum < @num_edges
+		throw "Edge #{edgeNum} is out of bounds. total: #{@num_edges}" unless 0 <= edgeNum < @num_edges
 
+		squareCompleted = false
 		@totalMoves++;
 		@board[edgeNum] = true
 
 		if @isVerticalEdge edgeNum
-			@checkSquare 'left', edgeNum unless @isOnPerimeter 'left', edgeNum
-			@checkSquare 'right', edgeNum unless @isOnPerimeter 'right', edgeNum
+			squareCompleted ||= @checkSquare 'left', edgeNum unless @isOnPerimeter 'left', edgeNum
+			squareCompleted ||= @checkSquare 'right', edgeNum unless @isOnPerimeter 'right', edgeNum
 		else
-			@checkSquare 'top', edgeNum unless @isOnPerimeter 'top', edgeNum
-			@checkSquare 'bottom', edgeNum unless @isOnPerimeter 'bottom', edgeNum
+			squareCompleted ||= @checkSquare 'top', edgeNum unless @isOnPerimeter 'top', edgeNum
+			squareCompleted ||= @checkSquare 'bottom', edgeNum unless @isOnPerimeter 'bottom', edgeNum
 
-		true
+		@players.nextState() unless squareCompleted
+		squareCompleted
 
 	checkSquare: (direction, edgeNum) ->
 		coordinates = switch direction

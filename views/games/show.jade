@@ -8,11 +8,10 @@ script
 	var gameId = !{game_id}
 	var container = $('#' + gameId);
 	var ClientGame = require('./client_game');
-	ClientGame.prototype = $.extend(ClientGame.prototype, serverGame);
-	var g = new ClientGame({
+	var g = new ClientGame($.extend(serverGame, {
 		container: container,
 		server: window.now
-	});
+	}));
 	g.render();
 
 	now.gameId = gameId;

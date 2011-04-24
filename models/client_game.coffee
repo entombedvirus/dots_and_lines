@@ -1,11 +1,18 @@
 BaseGame = require './base_game'
+StateMachine = require './state_machine'
 UI = require('./ui').getInstance()
 
 module.exports = class ClientGame extends BaseGame
 	constructor: (options)->
 		@container = options.container
 		@gameUrl = window.location.href
+		this[attr] = options[attr] for attr in ['size', 'alpha', 'num_edges', 'board', 'totalMoves']
+
+		@setupPlayerStateMachine options.players
 		@attachListeners()
+
+	setupPlayerStateMachine: (serverStateMachine) ->
+		@players = $.extend new StateMachine, serverStateMachine
 
 	attachListeners: ->
 		@container.click (e) =>
@@ -34,6 +41,13 @@ module.exports = class ClientGame extends BaseGame
 				UI.showMessage '''
 					It's not your turn...
 				'''
+			when 'playerJoined'
+				clientId = data[0]
+				@addPlayer clientId
+
+			when 'playerLeft'
+				clientId = data[0]
+				@removePlayer clientId
 
 			when 'fillEdge'
 				edgeNum = data[0];
