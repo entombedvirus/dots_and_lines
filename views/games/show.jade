@@ -17,3 +17,4 @@ script
 	now.gameId = gameId;
 
 	now.handleServerEvent = ClientGame.prototype.handleServerEvent.bind(g);
+	now.setClientId = function(cid) { window.clientId = cid };

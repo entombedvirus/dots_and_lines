@@ -21,7 +21,12 @@ module.exports = class ClientGame extends BaseGame
 		$(document).ready =>
 			players = @container.find('.players').empty()
 			for state, idx in @players.states
-				li = $("<li/>").text("Player #{idx+1}")
+				txt = if state == window.clientId
+					"You"
+				else
+					"Player #{idx + 1}"
+				li = $("<li/>").text txt
+
 				li.addClass 'currentTurn' if @players.getCurrentState() == state
 				players.append li
 			null

@@ -10,9 +10,13 @@ module.exports = class ServerGame extends BaseGame
 		@resetBoard()
 
 	attachListeners: ->
-		@clients.on 'connect', (clientId) =>
-			@addPlayer clientId
-			@emit 'playerJoined', clientId
+		game = this
+		@clients.on 'connect', ->
+			client = this
+			clientId = client.user.clientId
+			client.now.setClientId clientId
+			game.addPlayer clientId
+			game.emit 'playerJoined', clientId
 
 		@clients.on 'disconnect', (clientId) =>
 			@removePlayer clientId
