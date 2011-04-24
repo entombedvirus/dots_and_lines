@@ -18,6 +18,7 @@ module.exports = class StateMachine extends EventEmitter
 
 	nextState: ->
 		@counter++
+		@emit 'stateChanged'
 		this
 
 	getCurrentState: ->

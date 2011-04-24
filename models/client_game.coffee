@@ -13,6 +13,18 @@ module.exports = class ClientGame extends BaseGame
 
 	setupPlayerStateMachine: (serverStateMachine) ->
 		@players = $.extend new StateMachine, serverStateMachine
+		@players.on 'stateAdded', @refreshPlayerUI
+		@players.on 'stateRemoved', @refreshPlayerUI
+		@players.on 'stateChanged', @refreshPlayerUI
+	
+	refreshPlayerUI: =>
+		$(document).ready =>
+			players = @container.find('.players').empty()
+			for state, idx in @players.states
+				li = $("<li/>").text("Player #{idx+1}")
+				li.addClass 'currentTurn' if @players.getCurrentState() == state
+				players.append li
+			null
 
 	attachListeners: ->
 		@container.click (e) =>
@@ -59,6 +71,12 @@ module.exports = class ClientGame extends BaseGame
 		$(edges.get(edgeNum)).addClass 'filled'
 
 	render: ->
+		@renderBoard()
+		@renderPlayerUI()
+		
+	renderBoard: ->
+		board = $("<div class='board'></div>")
+
 		for edge, edgeNum in @board
 			link = $("<a></a>").html '&nbsp'
 			currentOrientation = @isVerticalEdge edgeNum
@@ -67,7 +85,14 @@ module.exports = class ClientGame extends BaseGame
 				link.addClass 'vert'
 			else
 				link.addClass 'horiz'
-			@container.append link
 			link.css 'clear', 'left' if switching
 			link.addClass 'filled' if @board[edgeNum]
+			board.append link
 			link.data 'edgeNum', edgeNum
+
+		board.appendTo @container
+
+	renderPlayerUI: ->
+		list = $("<ol class='players'></ol>")
+		list.appendTo @container
+
