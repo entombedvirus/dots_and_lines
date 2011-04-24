@@ -1,7 +1,7 @@
-AbstractGame = require './abstract_game'
+BaseGame = require './base_game'
 UI = require('./ui').getInstance()
 
-module.exports = class ClientGame extends AbstractGame
+module.exports = class ClientGame extends BaseGame
 	constructor: (options)->
 		@container = options.container
 		@gameUrl = window.location.href

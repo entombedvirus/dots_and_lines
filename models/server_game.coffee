@@ -1,6 +1,6 @@
-AbstractGame = require './abstract_game'
+BaseGame = require './base_game'
 
-module.exports = class ServerGame extends AbstractGame
+module.exports = class ServerGame extends BaseGame
 	constructor: (options) ->
 		@id = options.id
 		@size = options.size

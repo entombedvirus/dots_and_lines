@@ -1,4 +1,4 @@
-module.exports = class AbstractGame
+module.exports = class BaseGame
 	resetBoard: ->
 		@totalMoves = 0
 		@alpha = 2 * @size - 1
