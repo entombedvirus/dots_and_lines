@@ -32,15 +32,6 @@ module.exports = class ClientGame extends BaseGame
 			null
 
 	attachListeners: ->
-		@container.click (e) =>
-			target = $(e.target)
-			return unless target.is 'a'
-			
-			gameId = @container.attr 'id'
-			edgeNum = target.data 'edgeNum'
-			@emit 'fillEdge', edgeNum
-
-			return false
 	
 	emit: (eventName, data...) ->
 		window.now.handleClientEvent eventName, data
@@ -70,33 +61,9 @@ module.exports = class ClientGame extends BaseGame
 				edgeNum = data[0];
 				@fillEdge edgeNum
 
-	fillEdge: (edgeNum) ->
-		super
-		edges = @container.find('a');
-		$(edges.get(edgeNum)).addClass 'filled'
-
 	render: ->
-		@renderBoard()
 		@renderPlayerUI()
 		
-	renderBoard: ->
-		board = $("<div class='board'></div>")
-
-		for edge, edgeNum in @board
-			link = $("<a></a>").html '&nbsp'
-			currentOrientation = @isVerticalEdge edgeNum
-			switching =  currentOrientation != @isVerticalEdge(edgeNum - 1)
-			if currentOrientation
-				link.addClass 'vert'
-			else
-				link.addClass 'horiz'
-			link.css 'clear', 'left' if switching
-			link.addClass 'filled' if @board[edgeNum]
-			board.append link
-			link.data 'edgeNum', edgeNum
-
-		board.appendTo @container
-
 	renderPlayerUI: ->
 		list = $("<ol class='players'></ol>")
 		list.appendTo @container
