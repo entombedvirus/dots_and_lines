@@ -7,8 +7,10 @@ module.exports = class BaseGame
 		@num_edges = 2 * @size * (@size - 1)
 		@board = new Array @num_edges
 		@players = new StateMachine
+		@scoreCard = {}
 
 	addPlayer: (clientId) ->
+		@scoreCard[clientId] = 0
 		@players.addState clientId
 	
 	removePlayer: (clientId) ->
@@ -31,19 +33,25 @@ module.exports = class BaseGame
 	fillEdge: (edgeNum) ->
 		throw "Edge #{edgeNum} is out of bounds. total: #{@num_edges}" unless 0 <= edgeNum < @num_edges
 
-		squareCompleted = false
+		left = right = top = bottom = false
 		@totalMoves++;
 		@board[edgeNum] = true
 
 		if @isVerticalEdge edgeNum
-			squareCompleted ||= @checkSquare 'left', edgeNum unless @isOnPerimeter 'left', edgeNum
-			squareCompleted ||= @checkSquare 'right', edgeNum unless @isOnPerimeter 'right', edgeNum
+			left = @checkSquare 'left', edgeNum unless @isOnPerimeter 'left', edgeNum
+			right = @checkSquare 'right', edgeNum unless @isOnPerimeter 'right', edgeNum
 		else
-			squareCompleted ||= @checkSquare 'top', edgeNum unless @isOnPerimeter 'top', edgeNum
-			squareCompleted ||= @checkSquare 'bottom', edgeNum unless @isOnPerimeter 'bottom', edgeNum
+			top = @checkSquare 'top', edgeNum unless @isOnPerimeter 'top', edgeNum
+			bottom = @checkSquare 'bottom', edgeNum unless @isOnPerimeter 'bottom', edgeNum
 
-		@players.nextState() unless squareCompleted
-		squareCompleted
+		clientId = @players.getCurrentState()
+		@scoreCard[clientId] += 1 for completed in [left, right, top, bottom] when completed is true
+
+		pointScored = left or right or top or bottom
+		@players.nextState() unless pointScored
+
+		# return whether this move resulted in atleast one point
+		pointScored
 
 	checkSquare: (direction, edgeNum) ->
 		coordinates = switch direction

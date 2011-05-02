@@ -2,20 +2,26 @@ p The URL for the game is
 	a(href: "/g/" + game_id)= game_id
 
 div(id: game_id, class="game")
-	canvas(id: "board", data-processing-sources: "/g/" + game_id + ".pde")
+	canvas(id: "board")
 
 script
-	var serverGame = !{JSON.stringify(game.forClient())};
 	var gameId = !{game_id}
 	var container = $('#' + gameId);
 	var ClientGame = require('./client_game');
-	var game = new ClientGame($.extend(serverGame, {
-		container: container,
-		server: window.now
-	}));
-	game.render();
 
 	now.gameId = gameId;
-
-	now.handleServerEvent = ClientGame.prototype.handleServerEvent.bind(game);
 	now.setClientId = function(cid) { window.clientId = cid };
+
+	now.handleServerEvent = function() {
+		var game = window.game;
+		if (!game) return;
+		ClientGame.prototype.handleServerEvent.apply(game, arguments);
+	};
+	now.initializeClientGame = function(serverGame) { 
+		var game = new ClientGame($.extend(serverGame, {
+			container: container,
+			server: window.now
+		}));
+		game.render();
+		window.game = game;
+	};

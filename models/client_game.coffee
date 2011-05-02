@@ -6,10 +6,9 @@ module.exports = class ClientGame extends BaseGame
 	constructor: (options)->
 		@container = options.container
 		@gameUrl = window.location.href
-		this[attr] = options[attr] for attr in ['size', 'alpha', 'num_edges', 'board', 'totalMoves']
+		this[attr] = options[attr] for attr in ['size', 'alpha', 'num_edges', 'board', 'totalMoves', 'scoreCard']
 
 		@setupPlayerStateMachine options.players
-		@attachListeners()
 
 	setupPlayerStateMachine: (serverStateMachine) ->
 		@players = $.extend new StateMachine, serverStateMachine
@@ -20,19 +19,18 @@ module.exports = class ClientGame extends BaseGame
 	refreshPlayerUI: =>
 		$(document).ready =>
 			players = @container.find('.players').empty()
-			for state, idx in @players.states
-				txt = if state == window.clientId
+			for clientId, score of @scoreCard
+				txt = if clientId == window.clientId
 					"You"
 				else
-					"Player #{idx + 1}"
-				li = $("<li/>").text txt
+					"Player #{clientId}"
 
-				li.addClass 'currentTurn' if @players.getCurrentState() == state
+				li = $("<li/>").text txt + ": " + score
+				li.addClass('offline') unless clientId in @players.states
+				li.addClass 'currentTurn' if @players.getCurrentState() == clientId
 				players.append li
 			null
 
-	attachListeners: ->
-	
 	emit: (eventName, data...) ->
 		window.now.handleClientEvent eventName, data
 
@@ -61,7 +59,14 @@ module.exports = class ClientGame extends BaseGame
 				edgeNum = data[0];
 				@fillEdge edgeNum
 
+			when 'completeSquare'
+				@refreshPlayerUI()
+
 	render: ->
+		$.get "/game.pde", (res) =>
+			jsCode = Processing.compile res
+			new Processing @container.find("canvas").get(0), jsCode
+
 		@renderPlayerUI()
 		
 	renderPlayerUI: ->

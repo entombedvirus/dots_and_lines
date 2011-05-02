@@ -37,16 +37,12 @@ app.get '/games', (req, res) ->
 	res.local 'all_games', all_games
 	res.render 'games/index'
 
-app.get '/g/:game_id.:format?', (req, res) ->
+app.get '/g/:game_id', (req, res) ->
 	gid = req.params.game_id
 	all_games[gid] ||= createNewGame gid
 	res.local 'game_id', gid
 	res.local 'game', all_games[gid]
-	switch req.params.format
-		when 'pde'
-			res.sendfile __dirname + '/views/games/show.pde'
-		else
-			res.render 'games/show'
+	res.render 'games/show'
 
 # Only listen on $ node app.js
 unless module.parent
@@ -62,8 +58,11 @@ unless module.parent
 
 	everyone.connected ->
 		gameId = @now.gameId
+		return unless gameId?
+
 		room = nowjs.getGroup gameId
 		room.addUser @user.clientId
+		@now.initializeClientGame all_games[gameId].forClient()
 
 	everyone.disconnected ->
 		gameId = @now.gameId

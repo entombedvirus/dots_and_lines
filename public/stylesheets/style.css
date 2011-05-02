@@ -11,29 +11,10 @@ canvas {
 	display: block;
 	margin: 0 auto;
 	cursor: pointer;
+	outline: none;
 }
 a {
   color: #00B7FF;
-}
-
-.game a {
-	display: block;
-	float: left;
-	background-color: #f0f0f0;
-}
-.game a:hover,
-.game a.filled {
-	background-color: #333;
-}
-.game a.horiz {
-	width: 3.333em;
-	height: 1em;
-	text-align: center;
-}
-.game a.vert {
-	height: 3em;
-	width: 1em;
-	margin: 0 2em 0 0;
 }
 
 #notifications {
@@ -53,4 +34,8 @@ a {
 #notifications p {
 	padding: 0.3em;
 	display: inline
+}
+
+.game li.offline {
+	text-decoration: line-through;
 }

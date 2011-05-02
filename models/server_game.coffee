@@ -58,4 +58,5 @@ module.exports = class ServerGame extends BaseGame
 		num_edges: @num_edges
 		board: @board
 		players: @players
+		scoreCard: @scoreCard
 		totalMoves: @totalMoves
