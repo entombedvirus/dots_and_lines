@@ -1,3 +1,7 @@
+script(type: "text/javascript", src: "/nowjs/now.js")
+script(type: "text/javascript", src: "/javascripts/processing-1.1.0.min.js")
+script(type: "text/javascript", src: "/browserify.js")
+
 p The URL for the game is
 	a(href: "/g/" + game_id)= game_id
 
@@ -10,7 +14,6 @@ script
 	var ClientGame = require('./client_game');
 
 	now.gameId = gameId;
-	now.setClientId = function(cid) { window.clientId = cid };
 
 	now.handleServerEvent = function() {
 		var game = window.game;
@@ -25,3 +28,17 @@ script
 		game.render();
 		window.game = game;
 	};
+	now.getSession = function(cb) {
+		cb(FB.getSession());
+	};
+
+	now.ready(function() {
+		FB.getLoginStatus(function(resp) {
+			if (resp.session) {
+				now.uid = resp.session.uid;
+				now.startGame(!{JSON.stringify(game_id)}, now.uid);
+			} else {
+				window.location.href = "/login";
+			}
+		});
+	});

@@ -9,12 +9,18 @@ module.exports = class BaseGame
 		@players = new StateMachine
 		@scoreCard = {}
 
-	addPlayer: (clientId) ->
-		@scoreCard[clientId] = 0
-		@players.addState clientId
+	addPlayer: (clientId, uid) ->
+		if @scoreCard[uid]?
+			@scoreCard[uid].clientId = clientId
+		else
+			@scoreCard[uid] = 
+				clientId: clientId
+				score: 0
+
+		@players.addState uid
 	
-	removePlayer: (clientId) ->
-		@players.removeState clientId
+	removePlayer: (uid) ->
+		@players.removeState uid
 	
 	isVerticalEdge: (edgeNum) ->
 		(edgeNum % @alpha) >= Math.floor(@alpha / 2)
@@ -44,8 +50,8 @@ module.exports = class BaseGame
 			top = @checkSquare 'top', edgeNum unless @isOnPerimeter 'top', edgeNum
 			bottom = @checkSquare 'bottom', edgeNum unless @isOnPerimeter 'bottom', edgeNum
 
-		clientId = @players.getCurrentState()
-		@scoreCard[clientId] += 1 for completed in [left, right, top, bottom] when completed is true
+		uid = @players.getCurrentState()
+		@scoreCard[uid].score += 1 for completed in [left, right, top, bottom] when completed is true
 
 		pointScored = left or right or top or bottom
 		@players.nextState() unless pointScored

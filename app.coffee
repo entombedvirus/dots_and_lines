@@ -10,6 +10,7 @@ DEFAULT_BOARD_SIZE = 6
 DEFAULT_PORT = 3000
 
 all_games = {}
+uid2Client = {}
 
 createNewGame = (gameId) ->
 	room = nowjs.getGroup gameId
@@ -49,22 +50,34 @@ unless module.parent
 	app.listen DEFAULT_PORT
 	console.log "Express server listening on port %d", app.address().port
 
+	onClientDisconnected = ->
+		gameId = @now.gameId
+		room = nowjs.getGroup gameId
+		room.removeUser @user.clientId
+		delete uid2Client[@now.uid] if @now.uid?
+
 	# Start the dnode listener for persistent connections
 	everyone = nowjs.initialize app
+
+	everyone.now.startGame = (gameId, uid) ->
+		if oldClient = uid2Client[uid]
+			onClientDisconnected.call oldClient
+			oldClient.now.handleServerEvent 'gtfo', ['Duplicate Connection']
+
+		uid2Client[uid] = this
+
+		room = nowjs.getGroup gameId
+		room.addUser @user.clientId
+
+		serialized = all_games[gameId].forClient()
+		serialized['clientId'] = @user.clientId
+		@now.initializeClientGame serialized
+
+
+	everyone.disconnected onClientDisconnected
+
 	everyone.now.handleClientEvent = ->
 		gameId = @now.gameId
 		game = all_games[gameId]
 		ServerGame::handleClientEvent.call game, this, arguments...
 
-	everyone.connected ->
-		gameId = @now.gameId
-		return unless gameId?
-
-		room = nowjs.getGroup gameId
-		room.addUser @user.clientId
-		@now.initializeClientGame all_games[gameId].forClient()
-
-	everyone.disconnected ->
-		gameId = @now.gameId
-		room = nowjs.getGroup gameId
-		room.removeUser @user.clientId

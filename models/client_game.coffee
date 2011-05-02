@@ -6,7 +6,7 @@ module.exports = class ClientGame extends BaseGame
 	constructor: (options)->
 		@container = options.container
 		@gameUrl = window.location.href
-		this[attr] = options[attr] for attr in ['size', 'alpha', 'num_edges', 'board', 'totalMoves', 'scoreCard']
+		this[attr] = options[attr] for attr in ['size', 'alpha', 'num_edges', 'board', 'totalMoves', 'scoreCard', 'clientId']
 
 		@setupPlayerStateMachine options.players
 
@@ -19,18 +19,17 @@ module.exports = class ClientGame extends BaseGame
 	refreshPlayerUI: =>
 		$(document).ready =>
 			players = @container.find('.players').empty()
-			for clientId, score of @scoreCard
-				txt = if clientId == window.clientId
-					"You"
-				else
-					"Player #{clientId}"
+			for uid, {clientId, score} of @scoreCard
+				txt = "<fb:profile-pic uid='#{uid}'></fb:profile-pic>"
+				txt += "<span>#{score}</span>"
+				li = $("<li/>").html txt
 
-				li = $("<li/>").text txt + ": " + score
-				li.addClass('offline') unless clientId in @players.states
-				li.addClass 'currentTurn' if @players.getCurrentState() == clientId
+				li.addClass('offline') unless uid in @players.states
+				li.addClass 'currentTurn' if @players.getCurrentState() == uid
 				players.append li
-			null
 
+			FB.XFBML.parse(@container.get(0))
+	
 	emit: (eventName, data...) ->
 		window.now.handleClientEvent eventName, data
 
@@ -49,11 +48,12 @@ module.exports = class ClientGame extends BaseGame
 				'''
 			when 'playerJoined'
 				clientId = data[0]
-				@addPlayer clientId
+				uid = data[1]
+				@addPlayer clientId, uid
 
 			when 'playerLeft'
-				clientId = data[0]
-				@removePlayer clientId
+				uid = data[0]
+				@removePlayer uid
 
 			when 'fillEdge'
 				edgeNum = data[0];
@@ -61,6 +61,11 @@ module.exports = class ClientGame extends BaseGame
 
 			when 'completeSquare'
 				@refreshPlayerUI()
+
+			when 'gtfo'
+				msg = data[0]
+				UI.showMessage "Server kicked you. Reason: #{msg}", true
+				window.socket?.disconnect()
 
 	render: ->
 		$.get "/game.pde", (res) =>

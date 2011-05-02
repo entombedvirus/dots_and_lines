@@ -1,12 +1,19 @@
-!!!
-html
+!!! 5
+html(xmlns: 'http://www.w3.org/1999/xhtml', 'xmlns:fb': 'http://www.facebook.com/2008/fbml')
 	head
-		title Dots & Lines
+		title Dots &amp; Lines
+		meta('http-equiv': 'Content-Type', content: 'text/html; charset=UTF-8')
+
 		link(rel='stylesheet', href='/stylesheets/style.css')
-		// script(type: "text/javascript", src: "/javascripts/coffee-script.js")
-		// script(type: "text/coffeescript", src: "/javascripts/client.game.coffee")
-		script(type: "text/javascript", src: "/nowjs/now.js")
-		script(type: "text/javascript", src: "/javascripts/processing-1.1.0.min.js")
 		script(type: "text/javascript", src: "/javascripts/jquery-1.5.2.js")
-		script(type: "text/javascript", src: "/browserify.js")
-	body!= body
+
+	body
+		fb:login-button(autologoutlink: 'true')
+
+		#fb-root
+		script(src: 'http://connect.facebook.net/en_US/all.js')
+		script
+			FB.init({appId: '171439029577589', status: true, cookie: true, xfbml: true});
+
+		!= body
+

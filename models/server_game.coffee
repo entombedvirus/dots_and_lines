@@ -14,13 +14,15 @@ module.exports = class ServerGame extends BaseGame
 		@clients.on 'connect', ->
 			client = this
 			clientId = client.user.clientId
-			client.now.setClientId clientId
-			game.addPlayer clientId
-			game.emit 'playerJoined', clientId
 
-		@clients.on 'disconnect', (clientId) =>
-			@removePlayer clientId
-			@emit 'playerLeft', clientId
+			client.now.getSession (session) ->
+				return unless session?
+				game.addPlayer clientId, session.uid
+				game.emit 'playerJoined', clientId, session.uid
+
+		@clients.on 'disconnect', ->
+			game.removePlayer @now.uid
+			game.emit 'playerLeft', @now.uid
 
 	emit: (eventName, data...) ->
 		@clients.now.handleServerEvent eventName, data
@@ -34,7 +36,7 @@ module.exports = class ServerGame extends BaseGame
 					client.now.handleServerEvent 'needMorePlayers'
 					return false
 
-				if @players.getCurrentState() == client.user.clientId
+				if @players.getCurrentState() == client.now.uid
 					edgeNum = data[0]
 					@fillEdge edgeNum
 				else

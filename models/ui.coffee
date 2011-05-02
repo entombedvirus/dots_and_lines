@@ -5,10 +5,10 @@ class UI
 			@container.prependTo $('body')
 			@container.click @hideMessage
 
-	showMessage: (msg) ->
+	showMessage: (msg, sticky = false) ->
 		@container.find('p:first').text msg
 		@container.fadeIn('fast')
-		@restartHideTimer()
+		@restartHideTimer() unless sticky
 	
 	hideMessage: =>
 			@container.fadeOut 'slow'
