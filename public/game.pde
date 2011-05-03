@@ -1,6 +1,7 @@
 g = window.game;
 int gridSize, dotSize, gap;
 Edge[] edges = [];
+PImage[] profilePics = {};
 int hoveredEdge = 0;
 
 class Edge {
@@ -76,9 +77,46 @@ void setup() {
 
 void draw() {
 	background(16);
-	// drawOverlay();
+	drawCompletedSquares();
 	drawGrid();
+	drawEdges();
 
+	drawDancingBox();
+}
+
+void drawCompletedSquares() {
+	for (String uid in g.completedSquares) {
+		int[] topEdges = g.completedSquares[uid];
+		for (int idx = 0; idx < topEdges.length; idx++) {
+
+			PImage img;
+			if (!profilePics[uid]) {
+				profilePics[uid] = loadImage("http://graph.facebook.com/" + uid + "/picture");
+			}
+			img = profilePics[uid];
+
+			if (img.loaded) {
+				Edge e = new Edge(topEdges[idx]);
+				image(img, e.x1 + 25, e.y1 + 25);
+			}
+		}
+	}
+}
+
+void drawGrid() {
+	int curX = 0;
+	int curY = 0;
+	
+	for (int i = 0; i < gridSize; i++) {
+		curX = i * gap;
+		for (int j = 0; j < gridSize; j++) {
+			curY = j * gap;
+			rect(curX, curY, dotSize, dotSize);
+		}
+	}
+}
+
+void drawEdges() {
 	stroke(255);
 	Edge highlighted = null;
 	for (int i = 0; i < edges.length; i++) {
@@ -92,21 +130,6 @@ void draw() {
 		stroke(redValue, 0, 0);
 		highlighted.draw();
 		stroke(255);
-	}
-
-	drawDancingBox();
-}
-
-void drawGrid() {
-	int curX = 0;
-	int curY = 0;
-	
-	for (int i = 0; i < gridSize; i++) {
-		curX = i * gap;
-		for (int j = 0; j < gridSize; j++) {
-			curY = j * gap;
-			rect(curX, curY, dotSize, dotSize);
-		}
 	}
 }
 

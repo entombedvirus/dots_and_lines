@@ -6,7 +6,7 @@ module.exports = class ClientGame extends BaseGame
 	constructor: (options)->
 		@container = options.container
 		@gameUrl = window.location.href
-		this[attr] = options[attr] for attr in ['size', 'alpha', 'num_edges', 'board', 'totalMoves', 'scoreCard', 'clientId']
+		this[attr] = options[attr] for attr in ['size', 'alpha', 'num_edges', 'board', 'totalMoves', 'scoreCard', 'clientId', 'completedSquares']
 
 		@setupPlayerStateMachine options.players
 
@@ -19,7 +19,7 @@ module.exports = class ClientGame extends BaseGame
 	refreshPlayerUI: =>
 		$(document).ready =>
 			players = @container.find('.players').empty()
-			for uid, {clientId, score} of @scoreCard
+			for uid, score of @scoreCard
 				txt = "<fb:profile-pic uid='#{uid}'></fb:profile-pic>"
 				txt += "<span>#{score}</span>"
 				li = $("<li/>").html txt
@@ -75,6 +75,6 @@ module.exports = class ClientGame extends BaseGame
 		@renderPlayerUI()
 		
 	renderPlayerUI: ->
-		list = $("<ol class='players'></ol>")
+		list = $("<ul class='players'></ul>")
 		list.appendTo @container
 

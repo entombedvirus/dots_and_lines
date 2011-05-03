@@ -6,17 +6,12 @@ module.exports = class BaseGame
 		@alpha = 2 * @size - 1
 		@num_edges = 2 * @size * (@size - 1)
 		@board = new Array @num_edges
+		@completedSquares = {}
 		@players = new StateMachine
 		@scoreCard = {}
 
 	addPlayer: (clientId, uid) ->
-		if @scoreCard[uid]?
-			@scoreCard[uid].clientId = clientId
-		else
-			@scoreCard[uid] = 
-				clientId: clientId
-				score: 0
-
+		@scoreCard[uid] = 0 
 		@players.addState uid
 	
 	removePlayer: (uid) ->
@@ -40,18 +35,17 @@ module.exports = class BaseGame
 		throw "Edge #{edgeNum} is out of bounds. total: #{@num_edges}" unless 0 <= edgeNum < @num_edges
 
 		left = right = top = bottom = false
-		@totalMoves++;
+		@totalMoves++
 		@board[edgeNum] = true
 
 		if @isVerticalEdge edgeNum
 			left = @checkSquare 'left', edgeNum unless @isOnPerimeter 'left', edgeNum
 			right = @checkSquare 'right', edgeNum unless @isOnPerimeter 'right', edgeNum
+
 		else
 			top = @checkSquare 'top', edgeNum unless @isOnPerimeter 'top', edgeNum
 			bottom = @checkSquare 'bottom', edgeNum unless @isOnPerimeter 'bottom', edgeNum
 
-		uid = @players.getCurrentState()
-		@scoreCard[uid].score += 1 for completed in [left, right, top, bottom] when completed is true
 
 		pointScored = left or right or top or bottom
 		@players.nextState() unless pointScored
@@ -75,7 +69,24 @@ module.exports = class BaseGame
 			continue unless 0 <= edge < @num_edges
 			
 			# if one of the neighbor lines are not set, return false
-			return false unless @board[edge]
+			return false unless @board[edge]?
 
 		# if execution has gotten this far, all the neighbors are set
+		@addCompletedSquare(direction, edgeNum)
 		true
+	
+	addCompletedSquare: (direction, edgeNum) ->
+		topEdge = switch direction
+			when 'left'
+				edgeNum - @size
+			when 'right'
+				edgeNum - @size + 1
+			when 'top'
+				edgeNum - @alpha
+			when 'bottom'
+				edgeNum
+
+		uid = @players.getCurrentState();
+		@scoreCard[uid] += 1
+		(@completedSquares[uid] ?= []).push topEdge
+		topEdge

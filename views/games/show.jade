@@ -13,6 +13,22 @@ script
 	var container = $('#' + gameId);
 	var ClientGame = require('./client_game');
 
+	function startGame() {
+		now.ready(function() {
+			session = FB.getSession();
+			if (!session) {
+				$('#login').fadeIn('slow');
+				return;
+			}
+
+			now.uid = session.uid;
+			now.startGame(!{JSON.stringify(game_id)}, now.uid);
+		});
+	}
+
+	FB.Event.subscribe('auth.login', startGame);
+	FB.getLoginStatus(startGame);
+
 	now.gameId = gameId;
 
 	now.handleServerEvent = function() {
@@ -31,14 +47,3 @@ script
 	now.getSession = function(cb) {
 		cb(FB.getSession());
 	};
-
-	now.ready(function() {
-		FB.getLoginStatus(function(resp) {
-			if (resp.session) {
-				now.uid = resp.session.uid;
-				now.startGame(!{JSON.stringify(game_id)}, now.uid);
-			} else {
-				window.location.href = "/login";
-			}
-		});
-	});

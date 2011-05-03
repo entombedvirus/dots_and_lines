@@ -39,3 +39,14 @@ a {
 .game li.offline {
 	text-decoration: line-through;
 }
+
+#login {
+	display: none;
+	width: 200px;
+	margin: 100px auto;
+	padding: 20px;
+	text-align: center;
+	border-radius: 15px;
+
+	background-color: #444;
+}
