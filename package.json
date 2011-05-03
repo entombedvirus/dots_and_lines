@@ -1,0 +1,21 @@
+{
+  "name": "dots_and_line",
+  "description": "An implementation of the classic game Dots & Lines",
+  "version": "0.0.0",
+  "homepage": "https://github.com/entombedvirus/dots_and_lines",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/entombedvirus/dots_and_lines.git"
+  },
+  "author": "Rohith Ravi <entombedvirus@gmail.com> (https://github.com/entombedvirus)",
+  "directories": {
+    "lib": "."
+  },
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "express": "*",
+    "now": "*"
+  }
+}
