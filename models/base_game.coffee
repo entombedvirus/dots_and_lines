@@ -11,7 +11,7 @@ module.exports = class BaseGame
 		@scoreCard = {}
 
 	addPlayer: (clientId, uid) ->
-		@scoreCard[uid] = 0 
+		@scoreCard[uid] ?= 0
 		@players.addState uid
 	
 	removePlayer: (uid) ->
@@ -86,7 +86,7 @@ module.exports = class BaseGame
 			when 'bottom'
 				edgeNum
 
-		uid = @players.getCurrentState();
+		uid = @players.getCurrentState()
 		@scoreCard[uid] += 1
 		(@completedSquares[uid] ?= []).push topEdge
 		topEdge
