@@ -9,12 +9,19 @@ body {
 
 canvas {
 	display: block;
-	margin: 0 auto;
+	float: left;
 	cursor: pointer;
 	outline: none;
 }
 a {
   color: #00B7FF;
+}
+
+.game {
+	position: relative;
+	overflow: hidden;
+	width: 800px;
+	margin: 0 auto;
 }
 
 #notifications {
@@ -36,10 +43,6 @@ a {
 	display: inline
 }
 
-.game li.offline {
-	text-decoration: line-through;
-}
-
 #login {
 	display: none;
 	width: 200px;
@@ -49,4 +52,42 @@ a {
 	border-radius: 15px;
 
 	background-color: #444;
+}
+
+.players {
+	display: block;
+	margin: 0;
+	padding: 0;
+
+	text-align: center;
+	list-style: none;
+}
+.players li {
+	display: block;
+	float: left;
+	padding: 7px 5px;
+	margin: 0 0 0 7px;
+	background-color: #333;
+	border: 1px solid #ccc;
+}
+.players li:first-child {
+	margin-left: 30px;
+}
+.players li.currentTurn {
+	border-color: #373;
+}
+.players li.offline {
+	opacity: 0.2;
+}
+.players li a {
+	display: block;
+	width: 50px;
+	height: 50px;
+}
+.players li span {
+	display: block;
+	width: 50px;
+	margin: 22px 0 0 0;
+	background-color: #ccc;
+	color: #222;
 }

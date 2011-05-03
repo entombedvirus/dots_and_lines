@@ -24,8 +24,8 @@ module.exports = class ClientGame extends BaseGame
 				txt += "<span>#{score}</span>"
 				li = $("<li/>").html txt
 
-				li.addClass('offline') unless uid in @players.states
-				li.addClass 'currentTurn' if @players.getCurrentState() == uid
+				li.addClass('offline').attr('title', 'offline') unless uid in @players.states
+				li.addClass('currentTurn').attr('title', 'Current Turn') if @players.getCurrentState() == uid
 				players.append li
 
 			FB.XFBML.parse(@container.get(0))

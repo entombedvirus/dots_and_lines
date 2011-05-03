@@ -81,7 +81,7 @@ void draw() {
 	drawGrid();
 	drawEdges();
 
-	drawDancingBox();
+	//drawDancingBox();
 }
 
 void drawCompletedSquares() {
