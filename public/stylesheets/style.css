@@ -1,8 +1,9 @@
 html, body {
 	background-color: #111;
+	margin: 0;
+	padding: 0;
 }
 body {
-  padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 	color: #ccc;
 }
@@ -17,11 +18,28 @@ a {
   color: #00B7FF;
 }
 
+.game_url {
+	position: absolute;
+	top: 0;
+	right: 30px;
+	padding: 5px 15px 5px 15px;
+	margin: 0;
+
+	color: #222;
+	background-color: yellow;
+	border-bottom-right-radius: 15px;
+	border-bottom-left-radius: 15px;
+}
+.game_url:hover {
+	color: #444;
+	box-shadow: 0 0 10px yellow;
+}
+
 .game {
 	position: relative;
 	overflow: hidden;
 	width: 800px;
-	margin: 0 auto;
+	margin: 30px auto;
 }
 
 #notifications {
