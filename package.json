@@ -15,8 +15,8 @@
     "node": "*"
   },
   "dependencies": {
-    "express": "*",
-    "now": "*",
-    "browserify": "*"
+    "express": "2.2.2",
+    "now": "0.5.3",
+    "browserify": "0.3.1"
   }
 }
